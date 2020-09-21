@@ -1,0 +1,44 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/uhthomas/adya/cmd/adya",
+    visibility = ["//visibility:private"],
+    deps = ["@com_github_bwmarrin_discordgo//:go_default_library"],
+)
+
+go_binary(
+    name = "adya",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
+
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+
+go_image(
+    name = "image",
+    srcs = ["main.go"],
+    importpath = "github.com/uhthomas/adya/cmd/adya",
+    deps = ["@com_github_bwmarrin_discordgo//:go_default_library"],
+    goarch = "amd64",
+    goos = "linux",
+)
+
+load("@io_bazel_rules_docker//docker:docker.bzl", "docker_push")
+
+docker_push(
+    name = "push",
+    image = ":image",
+    registry = "docker.pkg.github.com",
+    repository = "uhthomas/adya/adya",
+    tag = "{STABLE_GIT_COMMIT}",
+)
+
+docker_push(
+    name = "push_tag",
+    image = ":image",
+    registry = "docker.pkg.github.com",
+    repository = "uhthomas/adya/adya",
+    tag = "{STABLE_GIT_REF}",
+)
