@@ -18,7 +18,7 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	member, err := s.State.Member(m.GuildID, m.Author.ID)
+	member, err := s.GuildMember(m.GuildID, m.Author.ID)
 	if err != nil {
 		log.Println(err)
 		return
