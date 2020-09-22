@@ -31,8 +31,9 @@ func Main(ctx context.Context) error {
 	for i := 0; i < 5; i++ {
 		if err := egress(ctx, c); err != nil {
 			log.Println(err)
+		} else {
+			log.Println("ok!")
 		}
-		log.Println("ok!")
 	}
 
 	token, ok := os.LookupEnv("TOKEN")
@@ -47,7 +48,7 @@ func Main(ctx context.Context) error {
 
 	s.AddHandler(internal.Handle)
 
-	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
 
 	if err := s.Open(); err != nil {
 		return fmt.Errorf("open: %w", err)

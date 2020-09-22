@@ -32,6 +32,7 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return false
 	}(); !ok {
+		log.Println("did not have adya role")
 		return
 	}
 
@@ -45,19 +46,21 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	sort.Sort(roles)
 
-	mask := 0
-	if m.Content == "!um" {
-		mask = discordgo.PermissionVoiceSpeak
-	}
-
 	for _, r := range roles[1:] {
+		p := r.Permissions
+		switch m.Content {
+		case "!mu":
+			p |= discordgo.PermissionVoiceSpeak
+		case "!um":
+			p &= ^discordgo.PermissionVoiceSpeak
+		}
 		if _, err := s.GuildRoleEdit(
 			m.GuildID,
 			r.ID,
 			r.Name,
 			r.Color,
 			r.Hoist,
-			r.Permissions|mask,
+			p,
 			r.Mentionable,
 		); err != nil {
 			log.Println(err)
