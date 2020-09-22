@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -12,17 +13,28 @@ import (
 	"github.com/uhthomas/adya/internal"
 )
 
-func sleep(ctx context.Context, d time.Duration) {
-	t := time.NewTimer(d)
-	defer t.Stop()
-
-	select {
-	case <-t.C:
-	case <-ctx.Done():
+func egress(ctx context.Context, c *http.Client) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://google.com/", nil)
+	if err != nil {
+		return fmt.Errorf("new request: %w", err)
 	}
+	res, err := c.Do(req)
+	if err != nil {
+		return fmt.Errorf("do request: %w", err)
+	}
+	defer res.Body.Close()
+	return nil
 }
 
 func Main(ctx context.Context) error {
+	c := &http.Client{Timeout: 5 * time.Second}
+	for i := 0; i < 5; i++ {
+		if err := egress(ctx, c); err != nil {
+			log.Println(err)
+		}
+		log.Println("ok!")
+	}
+
 	token, ok := os.LookupEnv("TOKEN")
 	if !ok {
 		return errors.New("missing token")
@@ -35,17 +47,10 @@ func Main(ctx context.Context) error {
 
 	s.AddHandler(internal.Handle)
 
-	for i := time.Duration(0); ; i++ {
-		if err := s.Open(); err != nil {
-			if i <= 5 {
-				sleep(ctx, i*2*time.Second)
-				continue
-			}
-			return fmt.Errorf("open: %w", err)
-		}
-		defer s.Close()
-		break
+	if err := s.Open(); err != nil {
+		return fmt.Errorf("open: %w", err)
 	}
+	defer s.Close()
 
 	<-ctx.Done()
 	return nil
