@@ -17,7 +17,10 @@ func (h *Handler) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	case "!mute":
 		if err := h.messageCreate(s, m, func() error {
 			return members(s, m.GuildID, func(m *discordgo.Member) error {
-				return s.GuildMemberMute(m.GuildID, m.User.ID, true)
+				if err := s.GuildMemberMute(m.GuildID, m.User.ID, true); err != nil {
+					log.Println(err)
+				}
+				return nil
 			})
 		}, true); err != nil {
 			log.Printf("mute: %v", err)
@@ -26,7 +29,10 @@ func (h *Handler) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	case "!unmute":
 		if err := h.messageCreate(s, m, func() error {
 			return members(s, m.GuildID, func(m *discordgo.Member) error {
-				return s.GuildMemberMute(m.GuildID, m.User.ID, false)
+				if err := s.GuildMemberMute(m.GuildID, m.User.ID, false); err != nil {
+					log.Println(err)
+				}
+				return nil
 			})
 		}, true); err != nil {
 			log.Printf("unmute: %v", err)
@@ -42,11 +48,12 @@ func (h *Handler) messageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	if err := s.MessageReactionAdd(m.ChannelID, m.ID, "🔄"); err != nil {
 		return fmt.Errorf("add in-progress emoji: %w", err)
 	}
+	defer s.MessageReactionRemove(m.ChannelID, m.ID, "🔄", s.State.User.ID)
 	if err := f(); err != nil {
+		if err := s.MessageReactionAdd(m.ChannelID, m.ID, "❌"); err != nil {
+			return fmt.Errorf("add error emoji: %w", err)
+		}
 		return err
-	}
-	if err := s.MessageReactionRemove(m.ChannelID, m.ID, "🔄", s.State.User.ID); err != nil {
-		return fmt.Errorf("remove in-progress emoji: %w", err)
 	}
 	if err := s.MessageReactionAdd(m.ChannelID, m.ID, "✅"); err != nil {
 		return fmt.Errorf("add done emoji: %w", err)
