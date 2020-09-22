@@ -2,6 +2,7 @@ package internal
 
 import (
 	"log"
+	"sort"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -17,7 +18,7 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	member, err := s.GuildMember(m.GuildID, m.Author.ID)
+	member, err := s.State.Member(m.GuildID, m.Author.ID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -34,18 +35,22 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	roles, err := s.GuildRoles(m.GuildID)
+	st, err := s.GuildRoles(m.GuildID)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	roles := discordgo.Roles(st)
+
+	sort.Sort(roles)
 
 	mask := 0
 	if m.Content == "!um" {
 		mask = discordgo.PermissionVoiceSpeak
 	}
 
-	for _, r := range roles {
+	for _, r := range roles[1:] {
 		if _, err := s.GuildRoleEdit(
 			m.GuildID,
 			r.ID,
@@ -56,7 +61,6 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 			r.Mentionable,
 		); err != nil {
 			log.Println(err)
-			return
 		}
 	}
 }

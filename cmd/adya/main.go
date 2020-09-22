@@ -47,6 +47,8 @@ func Main(ctx context.Context) error {
 
 	s.AddHandler(internal.Handle)
 
+	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+
 	if err := s.Open(); err != nil {
 		return fmt.Errorf("open: %w", err)
 	}
