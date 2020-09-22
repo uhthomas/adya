@@ -5,7 +5,10 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/uhthomas/adya/cmd/adya",
     visibility = ["//visibility:private"],
-    deps = ["@com_github_bwmarrin_discordgo//:go_default_library"],
+    deps = [
+        "//internal:go_default_library",
+        "@com_github_bwmarrin_discordgo//:go_default_library",
+    ],
 )
 
 go_binary(
@@ -19,10 +22,13 @@ load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 go_image(
     name = "image",
     srcs = ["main.go"],
-    importpath = "github.com/uhthomas/adya/cmd/adya",
-    deps = ["@com_github_bwmarrin_discordgo//:go_default_library"],
     goarch = "amd64",
     goos = "linux",
+    importpath = "github.com/uhthomas/adya/cmd/adya",
+    deps = [
+        "//internal:go_default_library",
+        "@com_github_bwmarrin_discordgo//:go_default_library",
+    ],
 )
 
 load("@io_bazel_rules_docker//docker:docker.bzl", "docker_push")
