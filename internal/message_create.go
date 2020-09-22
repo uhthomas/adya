@@ -16,24 +16,32 @@ func (h *Handler) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate
 	switch m.Content {
 	case "!mute":
 		if err := h.messageCreate(s, m, func() error {
-			return members(s, m.GuildID, func(m *discordgo.Member) error {
-				if err := s.GuildMemberMute(m.GuildID, m.User.ID, true); err != nil {
+			g, err := s.Guild(m.GuildID)
+			if err != nil {
+				return fmt.Errorf("guild: %w", err)
+			}
+			for _, vs := range g.VoiceStates {
+				if err := s.GuildMemberMute(g.ID, vs.UserID, true); err != nil {
 					log.Println(err)
 				}
-				return nil
-			})
+			}
+			return nil
 		}, true); err != nil {
 			log.Printf("mute: %v", err)
 			return
 		}
 	case "!unmute":
 		if err := h.messageCreate(s, m, func() error {
-			return members(s, m.GuildID, func(m *discordgo.Member) error {
-				if err := s.GuildMemberMute(m.GuildID, m.User.ID, false); err != nil {
+			g, err := s.Guild(m.GuildID)
+			if err != nil {
+				return fmt.Errorf("guild: %w", err)
+			}
+			for _, vs := range g.VoiceStates {
+				if err := s.GuildMemberMute(g.ID, vs.UserID, false); err != nil {
 					log.Println(err)
 				}
-				return nil
-			})
+			}
+			return nil
 		}, true); err != nil {
 			log.Printf("unmute: %v", err)
 			return
