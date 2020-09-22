@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/uhthomas/adya/internal"
@@ -22,7 +23,9 @@ func Main(ctx context.Context) error {
 		return fmt.Errorf("new session: %w", err)
 	}
 
-	s.AddHandler(internal.Handle)
+	internal.
+		NewHandler(strings.Split(strings.TrimSpace(os.Getenv("ADMINS")), ",")).
+		Handle(s)
 
 	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
 
