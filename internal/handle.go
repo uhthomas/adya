@@ -36,6 +36,19 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	switch m.Content {
+	case "!mu":
+		if _, err := s.ChannelMessageSend(m.ChannelID, "muting all roles"); err != nil {
+			log.Println(err)
+			return
+		}
+	case "!um":
+		if _, err := s.ChannelMessageSend(m.ChannelID, "unmuting all roles"); err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
 	st, err := s.GuildRoles(m.GuildID)
 	if err != nil {
 		log.Println(err)
@@ -49,9 +62,9 @@ func Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	for _, r := range roles[1:] {
 		p := r.Permissions
 		switch m.Content {
-		case "!mu":
-			p |= discordgo.PermissionVoiceSpeak
 		case "!um":
+			p |= discordgo.PermissionVoiceSpeak
+		case "!mu":
 			p &= ^discordgo.PermissionVoiceSpeak
 		}
 		if _, err := s.GuildRoleEdit(
