@@ -9,12 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install bazelisk
-        run: curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.5.0/bazelisk-linux-amd64" | install -D /dev/stdin "${GITHUB_WORKSPACE}/bin/bazel"
-      - uses: azure/docker-login@v1
+        run: curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.7.4/bazelisk-linux-amd64" | install -D /dev/stdin "${GITHUB_WORKSPACE}/bin/bazel"
+      - uses: docker/login-action@v1
         with:
-          login-server: docker.pkg.github.com
-          username: $GITHUB_ACTOR
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
       - run: bazel run //cmd/adya:push_tag
         env:
           GIT_COMMIT: ${{ github.sha }}
