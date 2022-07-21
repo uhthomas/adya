@@ -1,6 +1,6 @@
 module github.com/uhthomas/adya
 
-go 1.15
+go 1.18
 
 require (
 	github.com/bwmarrin/discordgo v0.25.0
