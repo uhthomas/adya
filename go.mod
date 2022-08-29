@@ -2,7 +2,7 @@ module github.com/uhthomas/adya
 
 go 1.19
 
-require github.com/bwmarrin/discordgo v0.26.0
+require github.com/bwmarrin/discordgo v0.26.1
 
 require (
 	github.com/gorilla/websocket v1.4.2 // indirect
