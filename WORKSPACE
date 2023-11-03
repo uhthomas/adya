@@ -13,9 +13,9 @@ http_archive(
 
 http_archive(
     name = "rules_proto",
-    sha256 = "b314236ff1b0de7b5d06b034739129171a54d58a4e11f0a71494d42395548413",
-    strip_prefix = "rules_proto-aaa54ca64e87699276b6f64e22ce800fae3637b5",
-    urls = ["https://github.com/bazelbuild/rules_proto/archive/aaa54ca64e87699276b6f64e22ce800fae3637b5.tar.gz"],
+    sha256 = "11f5ee3bf7142b432c7c877fb93b3a18afa2c5bc7a296fc59f71ce10999a2fa5",
+    strip_prefix = "rules_proto-4e32e70a700dac5b41e05ed6e9429e49ebb1a4ee",
+    urls = ["https://github.com/bazelbuild/rules_proto/archive/4e32e70a700dac5b41e05ed6e9429e49ebb1a4ee.tar.gz"],
 )
 
 http_archive(
